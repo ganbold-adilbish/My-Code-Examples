@@ -1,0 +1,39 @@
+{
+  "name": "graphql-api-sequelize-typescript",
+  "version": "1.0.0",
+  "description": "GraphQL API with Node.js, MySQL, Sequelize ORM, and TypeScript",
+  "main": "dist/server.js",
+  "scripts": {
+    "generate": "graphql-codegen --config codegen.yml",
+    "build": "npm run generate && tsc",
+    "start": "node dist/server.js",
+    "dev": "npm run generate && ts-node-dev --respawn --transpile-only src/server.ts",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "graphql",
+    "nodejs",
+    "sequelize",
+    "mysql",
+    "apollo",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "dotenv": "^16.4.0",
+    "graphql": "^16.8.0",
+    "mysql2": "^3.9.0",
+    "sequelize": "^6.37.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.0",
+    "@graphql-codegen/typescript-resolvers": "^4.0.0",
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}
