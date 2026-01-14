@@ -1,6 +1,13 @@
-# GraphQL API with Node.js, MySQL, Sequelize, and TypeScript
+# GraphQL API with Node.js and TypeScript
 
-A GraphQL API built with Node.js, Apollo Server, MySQL, Sequelize ORM, and TypeScript with auto-generated types.
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
+![GraphQL](https://img.shields.io/badge/GraphQL-E10098?logo=graphql&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?logo=sequelize&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+A fully-typed GraphQL API built with Node.js, Apollo Server, MySQL, Sequelize ORM, and TypeScript with auto-generated types.
 
 ## Tech Stack
 
@@ -63,12 +70,18 @@ CREATE DATABASE graphql_db;
 
 ### 3. Configure .env file
 
-Create a `.env` file in the project root:
+Copy the `.env.example` file and update with your credentials:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` with your MySQL credentials:
 
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=your_actual_password
 DB_NAME=graphql_db
 PORT=4000
 ```
