@@ -18,6 +18,9 @@ const config: Config = {
   collectCoverageFrom: [
     "src/**/*.ts",
     "!src/**/*.d.ts",
+    "!src/**/index.ts",
+    "!src/**/schema.ts",
+    "!src/__tests__/**",
     "!src/generated/**",
     "!src/server.ts",
   ],
