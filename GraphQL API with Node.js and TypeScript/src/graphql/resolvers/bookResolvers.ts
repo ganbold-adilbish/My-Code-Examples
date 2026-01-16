@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, ValidationError, ValidationErrorItem } from 'sequelize';
 import { BookModel } from '../../models';
 import {
   QueryResolvers,
@@ -53,10 +53,9 @@ export const bookMutations: MutationResolvers = {
       const book = await BookModel.create({ title, author, year });
       return book;
     } catch (error) {
-      if (error instanceof Error && error.name === 'SequelizeValidationError') {
-        const validationError = error as any;
+      if (error instanceof ValidationError) {
         throw new Error(
-          validationError.errors.map((e: any) => e.message).join(', ')
+          error.errors.map((e: ValidationErrorItem) => e.message).join(', ')
         );
       }
       console.error('Error adding book:', error);
@@ -83,10 +82,9 @@ export const bookMutations: MutationResolvers = {
 
       return book;
     } catch (error) {
-      if (error instanceof Error && error.name === 'SequelizeValidationError') {
-        const validationError = error as any;
+      if (error instanceof ValidationError) {
         throw new Error(
-          validationError.errors.map((e: any) => e.message).join(', ')
+          error.errors.map((e: ValidationErrorItem) => e.message).join(', ')
         );
       }
       console.error('Error updating book:', error);

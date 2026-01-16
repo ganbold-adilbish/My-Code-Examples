@@ -1,6 +1,9 @@
 import { Sequelize } from 'sequelize';
-import { initBookModel } from '../../models/Book';
-import { initUserModel } from '../../models/User';
+import { initBookModel, BookModel } from '../../models/Book';
+import { initUserModel, UserModel } from '../../models/User';
+
+type BookModelType = typeof BookModel;
+type UserModelType = typeof UserModel;
 
 // Test database configuration
 export const createTestDatabase = () => {
@@ -27,7 +30,10 @@ export const closeTestDatabase = async (sequelize: Sequelize) => {
 };
 
 // Create test book
-export const createTestBook = async (BookModel: any, data?: Partial<any>) => {
+export const createTestBook = async (
+  BookModel: BookModelType,
+  data?: Partial<{ title: string; author: string; year: number }>
+) => {
   return await BookModel.create({
     title: data?.title || 'Test Book',
     author: data?.author || 'Test Author',
@@ -36,7 +42,10 @@ export const createTestBook = async (BookModel: any, data?: Partial<any>) => {
 };
 
 // Create test user
-export const createTestUser = async (UserModel: any, data?: Partial<any>) => {
+export const createTestUser = async (
+  UserModel: UserModelType,
+  data?: Partial<{ name: string; email: string; year: number }>
+) => {
   return await UserModel.create({
     name: data?.name || 'Test User',
     email: data?.email || 'test@example.com',
@@ -45,7 +54,7 @@ export const createTestUser = async (UserModel: any, data?: Partial<any>) => {
 
 // Call GraphQL resolver (handles both function and object with resolve method)
 export const callResolver = (
-  resolver: any,
+  resolver: unknown,
   parent = {},
   args = {},
   context = {},
@@ -54,7 +63,12 @@ export const callResolver = (
   if (typeof resolver === 'function') {
     return resolver(parent, args, context, info);
   }
-  if (resolver && typeof resolver.resolve === 'function') {
+  if (
+    resolver &&
+    typeof resolver === 'object' &&
+    'resolve' in resolver &&
+    typeof resolver.resolve === 'function'
+  ) {
     return resolver.resolve(parent, args, context, info);
   }
   throw new Error(

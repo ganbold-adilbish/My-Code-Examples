@@ -8,6 +8,7 @@ interface UserAttributes {
   updated_at?: Date;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface UserCreationAttributes extends Optional<
   UserAttributes,
   'id' | 'created_at' | 'updated_at'
@@ -69,10 +70,10 @@ export function initUserModel(sequelize: Sequelize): typeof UserModel {
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       hooks: {
-        beforeCreate: (user, options) => {
+        beforeCreate: (user, _options) => {
           user.email = user.email.toLowerCase();
         },
-        beforeUpdate: (user, options) => {
+        beforeUpdate: (user, _options) => {
           if (user.changed('email')) {
             user.email = user.email.toLowerCase();
           }

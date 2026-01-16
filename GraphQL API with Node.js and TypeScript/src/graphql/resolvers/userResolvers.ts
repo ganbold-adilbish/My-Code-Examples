@@ -4,6 +4,7 @@ import {
   MutationResolvers,
   UserResolvers,
 } from '../../generated/graphql';
+import { ValidationError, ValidationErrorItem } from 'sequelize';
 
 export const userQueries: QueryResolvers = {
   users: async () => {
@@ -41,9 +42,11 @@ export const userMutations: MutationResolvers = {
           throw new Error('Email already exists');
         }
         if (error.name === 'SequelizeValidationError') {
-          const validationError = error as any;
+          const validationError = error as ValidationError;
           throw new Error(
-            validationError.errors.map((e: any) => e.message).join(', ')
+            validationError.errors
+              .map((e: ValidationErrorItem) => e.message)
+              .join(', ')
           );
         }
       }
@@ -74,9 +77,11 @@ export const userMutations: MutationResolvers = {
           throw new Error('Email already exists');
         }
         if (error.name === 'SequelizeValidationError') {
-          const validationError = error as any;
+          const validationError = error as ValidationError;
           throw new Error(
-            validationError.errors.map((e: any) => e.message).join(', ')
+            validationError.errors
+              .map((e: ValidationErrorItem) => e.message)
+              .join(', ')
           );
         }
       }

@@ -347,7 +347,9 @@ describe('User Resolvers', () => {
         jest.spyOn(UserModel, 'findByPk').mockResolvedValueOnce({
           ...testUser,
           update: jest.fn().mockRejectedValueOnce('String error'),
-        } as any);
+        } as Partial<InstanceType<typeof UserModel>> as InstanceType<
+          typeof UserModel
+        >);
 
         await expect(
           callResolver(

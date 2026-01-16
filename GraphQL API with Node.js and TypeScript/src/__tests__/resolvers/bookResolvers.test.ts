@@ -127,14 +127,14 @@ describe('Book Resolvers', () => {
           { title: '1984', author: 'George Orwell', year: 1949 },
         ]);
 
-        const books = await callResolver(
+        const books = (await callResolver(
           bookQueries.searchBooks,
           {},
           { title: 'Great' }
-        );
+        )) as InstanceType<typeof BookModel>[];
 
         expect(books).toHaveLength(2);
-        expect(books.every((b: any) => b.title.includes('Great'))).toBe(true);
+        expect(books.every((b) => b.title.includes('Great'))).toBe(true);
       });
 
       it('should return empty array when no matches', async () => {
@@ -390,7 +390,9 @@ describe('Book Resolvers', () => {
         jest.spyOn(BookModel, 'findByPk').mockResolvedValueOnce({
           ...testBook,
           update: jest.fn().mockRejectedValueOnce('String error'),
-        } as any);
+        } as Partial<InstanceType<typeof BookModel>> as InstanceType<
+          typeof BookModel
+        >);
 
         await expect(
           callResolver(
