@@ -1,21 +1,21 @@
-import { Op } from "sequelize";
-import { BookModel } from "../../models";
+import { Op } from 'sequelize';
+import { BookModel } from '../../models';
 import {
   QueryResolvers,
   MutationResolvers,
   BookResolvers,
-} from "../../generated/graphql";
+} from '../../generated/graphql';
 
 export const bookQueries: QueryResolvers = {
   books: async () => {
     try {
       const books = await BookModel.findAll({
-        order: [["id", "DESC"]],
+        order: [['id', 'DESC']],
       });
       return books;
     } catch (error) {
-      console.error("Error fetching books:", error);
-      throw new Error("Failed to fetch books");
+      console.error('Error fetching books:', error);
+      throw new Error('Failed to fetch books');
     }
   },
 
@@ -25,8 +25,8 @@ export const bookQueries: QueryResolvers = {
       if (!book) return null;
       return book;
     } catch (error) {
-      console.error("Error fetching book:", error);
-      throw new Error("Failed to fetch book");
+      console.error('Error fetching book:', error);
+      throw new Error('Failed to fetch book');
     }
   },
 
@@ -41,8 +41,8 @@ export const bookQueries: QueryResolvers = {
       });
       return books;
     } catch (error) {
-      console.error("Error searching books:", error);
-      throw new Error("Failed to search books");
+      console.error('Error searching books:', error);
+      throw new Error('Failed to search books');
     }
   },
 };
@@ -53,14 +53,14 @@ export const bookMutations: MutationResolvers = {
       const book = await BookModel.create({ title, author, year });
       return book;
     } catch (error) {
-      if (error instanceof Error && error.name === "SequelizeValidationError") {
+      if (error instanceof Error && error.name === 'SequelizeValidationError') {
         const validationError = error as any;
         throw new Error(
-          validationError.errors.map((e: any) => e.message).join(", ")
+          validationError.errors.map((e: any) => e.message).join(', ')
         );
       }
-      console.error("Error adding book:", error);
-      throw new Error("Failed to add book");
+      console.error('Error adding book:', error);
+      throw new Error('Failed to add book');
     }
   },
 
@@ -68,7 +68,7 @@ export const bookMutations: MutationResolvers = {
     try {
       const book = await BookModel.findByPk(id);
       if (!book) {
-        throw new Error("Book not found");
+        throw new Error('Book not found');
       }
 
       const updates: Partial<{ title: string; author: string; year: number }> =
@@ -83,14 +83,14 @@ export const bookMutations: MutationResolvers = {
 
       return book;
     } catch (error) {
-      if (error instanceof Error && error.name === "SequelizeValidationError") {
+      if (error instanceof Error && error.name === 'SequelizeValidationError') {
         const validationError = error as any;
         throw new Error(
-          validationError.errors.map((e: any) => e.message).join(", ")
+          validationError.errors.map((e: any) => e.message).join(', ')
         );
       }
-      console.error("Error updating book:", error);
-      throw error instanceof Error ? error : new Error("Failed to update book");
+      console.error('Error updating book:', error);
+      throw error instanceof Error ? error : new Error('Failed to update book');
     }
   },
 
@@ -101,8 +101,8 @@ export const bookMutations: MutationResolvers = {
       });
       return result > 0;
     } catch (error) {
-      console.error("Error deleting book:", error);
-      throw new Error("Failed to delete book");
+      console.error('Error deleting book:', error);
+      throw new Error('Failed to delete book');
     }
   },
 };

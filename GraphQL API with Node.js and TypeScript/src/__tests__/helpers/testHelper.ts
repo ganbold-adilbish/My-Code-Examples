@@ -1,12 +1,12 @@
-import { Sequelize } from "sequelize";
-import { initBookModel } from "../../models/Book";
-import { initUserModel } from "../../models/User";
+import { Sequelize } from 'sequelize';
+import { initBookModel } from '../../models/Book';
+import { initUserModel } from '../../models/User';
 
 // Test database configuration
 export const createTestDatabase = () => {
   const sequelize = new Sequelize({
-    dialect: "sqlite",
-    storage: ":memory:",
+    dialect: 'sqlite',
+    storage: ':memory:',
     logging: false,
   });
 
@@ -29,8 +29,8 @@ export const closeTestDatabase = async (sequelize: Sequelize) => {
 // Create test book
 export const createTestBook = async (BookModel: any, data?: Partial<any>) => {
   return await BookModel.create({
-    title: data?.title || "Test Book",
-    author: data?.author || "Test Author",
+    title: data?.title || 'Test Book',
+    author: data?.author || 'Test Author',
     year: data?.year || 2024,
   });
 };
@@ -38,8 +38,8 @@ export const createTestBook = async (BookModel: any, data?: Partial<any>) => {
 // Create test user
 export const createTestUser = async (UserModel: any, data?: Partial<any>) => {
   return await UserModel.create({
-    name: data?.name || "Test User",
-    email: data?.email || "test@example.com",
+    name: data?.name || 'Test User',
+    email: data?.email || 'test@example.com',
   });
 };
 
@@ -51,13 +51,13 @@ export const callResolver = (
   context = {},
   info = {}
 ) => {
-  if (typeof resolver === "function") {
+  if (typeof resolver === 'function') {
     return resolver(parent, args, context, info);
   }
-  if (resolver && typeof resolver.resolve === "function") {
+  if (resolver && typeof resolver.resolve === 'function') {
     return resolver.resolve(parent, args, context, info);
   }
   throw new Error(
-    "Resolver is not a function or does not have a resolve method"
+    'Resolver is not a function or does not have a resolve method'
   );
 };

@@ -1,12 +1,12 @@
 overwrite: true
-schema: "./src/graphql/schema.ts"
+schema: './src/graphql/schema.ts'
 generates:
   src/generated/graphql.ts:
     plugins:
-      - "typescript"
-      - "typescript-resolvers"
+      - 'typescript'
+      - 'typescript-resolvers'
     config:
       useIndexSignature: true
       mappers:
-        Book: "../models/Book#BookModel"
-        User: "../models/User#UserModel"
+        Book: '../models/Book#BookModel'
+        User: '../models/User#UserModel'

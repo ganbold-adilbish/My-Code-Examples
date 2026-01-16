@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import { DataTypes, Model, Sequelize, Optional } from 'sequelize';
 
 interface UserAttributes {
   id: number;
@@ -8,8 +8,10 @@ interface UserAttributes {
   updated_at?: Date;
 }
 
-interface UserCreationAttributes
-  extends Optional<UserAttributes, "id" | "created_at" | "updated_at"> {}
+interface UserCreationAttributes extends Optional<
+  UserAttributes,
+  'id' | 'created_at' | 'updated_at'
+> {}
 
 export class UserModel
   extends Model<UserAttributes, UserCreationAttributes>
@@ -38,11 +40,11 @@ export function initUserModel(sequelize: Sequelize): typeof UserModel {
         allowNull: false,
         validate: {
           notEmpty: {
-            msg: "Name cannot be empty",
+            msg: 'Name cannot be empty',
           },
           len: {
             args: [2, 255],
-            msg: "Name must be between 2 and 255 characters",
+            msg: 'Name must be between 2 and 255 characters',
           },
         },
       },
@@ -52,26 +54,26 @@ export function initUserModel(sequelize: Sequelize): typeof UserModel {
         unique: true,
         validate: {
           isEmail: {
-            msg: "Must be a valid email address",
+            msg: 'Must be a valid email address',
           },
           notEmpty: {
-            msg: "Email cannot be empty",
+            msg: 'Email cannot be empty',
           },
         },
       },
     },
     {
       sequelize,
-      tableName: "users",
+      tableName: 'users',
       timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       hooks: {
         beforeCreate: (user, options) => {
           user.email = user.email.toLowerCase();
         },
         beforeUpdate: (user, options) => {
-          if (user.changed("email")) {
+          if (user.changed('email')) {
             user.email = user.email.toLowerCase();
           }
         },

@@ -9,9 +9,15 @@ interface BookAttributes {
   updated_at?: Date;
 }
 
-interface BookCreationAttributes extends Optional<BookAttributes, 'id' | 'created_at' | 'updated_at'> {}
+interface BookCreationAttributes extends Optional<
+  BookAttributes,
+  'id' | 'created_at' | 'updated_at'
+> {}
 
-export class BookModel extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
+export class BookModel
+  extends Model<BookAttributes, BookCreationAttributes>
+  implements BookAttributes
+{
   public id!: number;
   public title!: string;
   public author!: string;
@@ -29,54 +35,54 @@ export function initBookModel(sequelize: Sequelize): typeof BookModel {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       title: {
         type: DataTypes.STRING(255),
         allowNull: false,
         validate: {
           notEmpty: {
-            msg: 'Title cannot be empty'
+            msg: 'Title cannot be empty',
           },
           len: {
             args: [1, 255],
-            msg: 'Title must be between 1 and 255 characters'
-          }
-        }
+            msg: 'Title must be between 1 and 255 characters',
+          },
+        },
       },
       author: {
         type: DataTypes.STRING(255),
         allowNull: false,
         validate: {
           notEmpty: {
-            msg: 'Author cannot be empty'
-          }
-        }
+            msg: 'Author cannot be empty',
+          },
+        },
       },
       year: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
           isInt: {
-            msg: 'Year must be an integer'
+            msg: 'Year must be an integer',
           },
           min: {
             args: [1000],
-            msg: 'Year must be at least 1000'
+            msg: 'Year must be at least 1000',
           },
           max: {
             args: [new Date().getFullYear() + 10],
-            msg: 'Year cannot be too far in the future'
-          }
-        }
-      }
+            msg: 'Year cannot be too far in the future',
+          },
+        },
+      },
     },
     {
       sequelize,
       tableName: 'books',
       timestamps: true,
       createdAt: 'created_at',
-      updatedAt: 'updated_at'
+      updatedAt: 'updated_at',
     }
   );
 

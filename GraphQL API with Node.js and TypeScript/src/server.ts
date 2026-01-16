@@ -16,11 +16,11 @@ async function startServer() {
   try {
     await testConnection();
     await syncDatabase();
-    
+
     const { url } = await startStandaloneServer(server, {
       listen: { port: Number(process.env.PORT) || 4000 },
     });
-    
+
     console.log(`🚀 GraphQL Server ready at: ${url}`);
   } catch (error) {
     console.error('Failed to start server:', error);

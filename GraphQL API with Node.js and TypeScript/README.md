@@ -334,7 +334,7 @@ npm run watch
 All resolvers are fully typed using auto-generated types:
 
 ```typescript
-import { QueryResolvers, MutationResolvers } from "../../generated/graphql";
+import { QueryResolvers, MutationResolvers } from '../../generated/graphql';
 
 export const bookQueries: QueryResolvers = {
   books: async () => {

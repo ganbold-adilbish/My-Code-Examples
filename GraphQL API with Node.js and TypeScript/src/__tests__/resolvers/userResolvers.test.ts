@@ -4,17 +4,17 @@ import {
   closeTestDatabase,
   createTestUser,
   callResolver,
-} from "../helpers/testHelper";
+} from '../helpers/testHelper';
 import {
   userQueries,
   userMutations,
-} from "../../graphql/resolvers/userResolvers";
+} from '../../graphql/resolvers/userResolvers';
 
-describe("User Resolvers", () => {
+describe('User Resolvers', () => {
   const { sequelize, UserModel } = createTestDatabase();
 
   beforeAll(async () => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     await syncTestDatabase(sequelize);
   });
 
@@ -27,12 +27,12 @@ describe("User Resolvers", () => {
     await UserModel.destroy({ where: {}, truncate: true });
   });
 
-  describe("Queries", () => {
-    describe("users", () => {
-      it("should return all users", async () => {
+  describe('Queries', () => {
+    describe('users', () => {
+      it('should return all users', async () => {
         await UserModel.bulkCreate([
-          { name: "User 1", email: "user1@example.com" },
-          { name: "User 2", email: "user2@example.com" },
+          { name: 'User 1', email: 'user1@example.com' },
+          { name: 'User 2', email: 'user2@example.com' },
         ]);
 
         const users = await callResolver(userQueries.users);
@@ -41,23 +41,23 @@ describe("User Resolvers", () => {
         expect(users[0].name).toBeDefined();
       });
 
-      it("should return empty array when no users", async () => {
+      it('should return empty array when no users', async () => {
         const users = await callResolver(userQueries.users);
         expect(users).toHaveLength(0);
       });
 
-      it("should return users in descending order by id", async () => {
+      it('should return users in descending order by id', async () => {
         const user1 = await createTestUser(UserModel, {
-          name: "First",
-          email: "first@example.com",
+          name: 'First',
+          email: 'first@example.com',
         });
         const user2 = await createTestUser(UserModel, {
-          name: "Second",
-          email: "second@example.com",
+          name: 'Second',
+          email: 'second@example.com',
         });
         const user3 = await createTestUser(UserModel, {
-          name: "Third",
-          email: "third@example.com",
+          name: 'Third',
+          email: 'third@example.com',
         });
 
         const users = await callResolver(userQueries.users);
@@ -67,25 +67,25 @@ describe("User Resolvers", () => {
         expect(users[2].id).toBe(user1.id);
       });
 
-      it("should throw error when fetching users fails", async () => {
+      it('should throw error when fetching users fails', async () => {
         jest
-          .spyOn(UserModel, "findAll")
-          .mockRejectedValueOnce(new Error("DB error"));
+          .spyOn(UserModel, 'findAll')
+          .mockRejectedValueOnce(new Error('DB error'));
 
         await expect(callResolver(userQueries.users)).rejects.toThrow(
-          "Failed to fetch users"
+          'Failed to fetch users'
         );
 
         expect(console.error).toHaveBeenCalledWith(
-          "Error fetching users:",
+          'Error fetching users:',
           expect.any(Error)
         );
       });
     });
 
-    describe("user", () => {
-      it("should return a user by id", async () => {
-        const testUser = await createTestUser(UserModel, { name: "Test User" });
+    describe('user', () => {
+      it('should return a user by id', async () => {
+        const testUser = await createTestUser(UserModel, { name: 'Test User' });
 
         const user = await callResolver(
           userQueries.user,
@@ -94,143 +94,143 @@ describe("User Resolvers", () => {
         );
 
         expect(user).not.toBeNull();
-        expect(user?.name).toBe("Test User");
+        expect(user?.name).toBe('Test User');
       });
 
-      it("should return null for non-existent id", async () => {
-        const user = await callResolver(userQueries.user, {}, { id: "999" });
+      it('should return null for non-existent id', async () => {
+        const user = await callResolver(userQueries.user, {}, { id: '999' });
         expect(user).toBeNull();
       });
 
-      it("should throw error when fetching user fails", async () => {
+      it('should throw error when fetching user fails', async () => {
         jest
-          .spyOn(UserModel, "findByPk")
-          .mockRejectedValueOnce(new Error("DB error"));
+          .spyOn(UserModel, 'findByPk')
+          .mockRejectedValueOnce(new Error('DB error'));
 
         await expect(
-          callResolver(userQueries.user, {}, { id: "1" })
-        ).rejects.toThrow("Failed to fetch user");
+          callResolver(userQueries.user, {}, { id: '1' })
+        ).rejects.toThrow('Failed to fetch user');
 
         expect(console.error).toHaveBeenCalledWith(
-          "Error fetching user:",
+          'Error fetching user:',
           expect.any(Error)
         );
       });
     });
   });
 
-  describe("Mutations", () => {
-    describe("addUser", () => {
-      it("should create a new user", async () => {
+  describe('Mutations', () => {
+    describe('addUser', () => {
+      it('should create a new user', async () => {
         const user = await callResolver(
           userMutations.addUser,
           {},
           {
-            name: "New User",
-            email: "new@example.com",
+            name: 'New User',
+            email: 'new@example.com',
           }
         );
 
         expect(user.id).toBeDefined();
-        expect(user.name).toBe("New User");
-        expect(user.email).toBe("new@example.com");
+        expect(user.name).toBe('New User');
+        expect(user.email).toBe('new@example.com');
       });
 
-      it("should fail with invalid email", async () => {
+      it('should fail with invalid email', async () => {
         await expect(
           callResolver(
             userMutations.addUser,
             {},
             {
-              name: "Test User",
-              email: "invalid-email",
+              name: 'Test User',
+              email: 'invalid-email',
             }
           )
         ).rejects.toThrow();
       });
 
-      it("should fail with duplicate email", async () => {
-        await createTestUser(UserModel, { email: "test@example.com" });
+      it('should fail with duplicate email', async () => {
+        await createTestUser(UserModel, { email: 'test@example.com' });
 
         await expect(
           callResolver(
             userMutations.addUser,
             {},
             {
-              name: "Another User",
-              email: "test@example.com",
+              name: 'Another User',
+              email: 'test@example.com',
             }
           )
-        ).rejects.toThrow("Email already exists");
+        ).rejects.toThrow('Email already exists');
       });
 
-      it("should fail with empty name", async () => {
+      it('should fail with empty name', async () => {
         await expect(
           callResolver(
             userMutations.addUser,
             {},
             {
-              name: "",
-              email: "test@example.com",
+              name: '',
+              email: 'test@example.com',
             }
           )
         ).rejects.toThrow();
       });
 
-      it("should handle email case insensitivity for duplicates", async () => {
-        await createTestUser(UserModel, { email: "test@example.com" });
+      it('should handle email case insensitivity for duplicates', async () => {
+        await createTestUser(UserModel, { email: 'test@example.com' });
 
         await expect(
           callResolver(
             userMutations.addUser,
             {},
             {
-              name: "Another User",
-              email: "TEST@EXAMPLE.COM",
+              name: 'Another User',
+              email: 'TEST@EXAMPLE.COM',
             }
           )
-        ).rejects.toThrow("Email already exists");
+        ).rejects.toThrow('Email already exists');
       });
 
-      it("should handle special characters in name", async () => {
+      it('should handle special characters in name', async () => {
         const specialName = "O'Brien-Smith";
         const user = await callResolver(
           userMutations.addUser,
           {},
           {
             name: specialName,
-            email: "obrien@example.com",
+            email: 'obrien@example.com',
           }
         );
 
         expect(user.name).toBe(specialName);
       });
 
-      it("should throw generic error when create fails", async () => {
+      it('should throw generic error when create fails', async () => {
         jest
-          .spyOn(UserModel, "create")
-          .mockRejectedValueOnce(new Error("DB error"));
+          .spyOn(UserModel, 'create')
+          .mockRejectedValueOnce(new Error('DB error'));
 
         await expect(
           callResolver(
             userMutations.addUser,
             {},
             {
-              name: "Test User",
-              email: "test@example.com",
+              name: 'Test User',
+              email: 'test@example.com',
             }
           )
-        ).rejects.toThrow("Failed to add user");
+        ).rejects.toThrow('Failed to add user');
 
         expect(console.error).toHaveBeenCalledWith(
-          "Error adding user:",
+          'Error adding user:',
           expect.any(Error)
         );
       });
     });
 
-    describe("updateUser", () => {
-      it("should update user fields", async () => {
+    describe('updateUser', () => {
+      it('should update user fields', async () => {
         const testUser = await createTestUser(UserModel);
 
         const updated = await callResolver(
@@ -238,31 +238,31 @@ describe("User Resolvers", () => {
           {},
           {
             id: testUser.id.toString(),
-            name: "Updated Name",
+            name: 'Updated Name',
           }
         );
 
-        expect(updated?.name).toBe("Updated Name");
+        expect(updated?.name).toBe('Updated Name');
         expect(updated?.email).toBe(testUser.email);
       });
 
-      it("should throw error for non-existent user", async () => {
+      it('should throw error for non-existent user', async () => {
         await expect(
           callResolver(
             userMutations.updateUser,
             {},
             {
-              id: "999",
-              name: "Updated",
+              id: '999',
+              name: 'Updated',
             }
           )
-        ).rejects.toThrow("User not found");
+        ).rejects.toThrow('User not found');
       });
 
-      it("should fail when updating to duplicate email", async () => {
-        await createTestUser(UserModel, { email: "existing@example.com" });
+      it('should fail when updating to duplicate email', async () => {
+        await createTestUser(UserModel, { email: 'existing@example.com' });
         const user2 = await createTestUser(UserModel, {
-          email: "user2@example.com",
+          email: 'user2@example.com',
         });
 
         await expect(
@@ -271,13 +271,13 @@ describe("User Resolvers", () => {
             {},
             {
               id: user2.id.toString(),
-              email: "existing@example.com",
+              email: 'existing@example.com',
             }
           )
-        ).rejects.toThrow("Email already exists");
+        ).rejects.toThrow('Email already exists');
       });
 
-      it("should not update if no fields provided", async () => {
+      it('should not update if no fields provided', async () => {
         const testUser = await createTestUser(UserModel);
 
         const updated = await callResolver(
@@ -291,7 +291,7 @@ describe("User Resolvers", () => {
         expect(updated?.name).toBe(testUser.name);
       });
 
-      it("should update multiple fields at once", async () => {
+      it('should update multiple fields at once', async () => {
         const testUser = await createTestUser(UserModel);
 
         const updated = await callResolver(
@@ -299,16 +299,16 @@ describe("User Resolvers", () => {
           {},
           {
             id: testUser.id.toString(),
-            name: "New Name",
-            email: "newemail@example.com",
+            name: 'New Name',
+            email: 'newemail@example.com',
           }
         );
 
-        expect(updated?.name).toBe("New Name");
-        expect(updated?.email).toBe("newemail@example.com");
+        expect(updated?.name).toBe('New Name');
+        expect(updated?.email).toBe('newemail@example.com');
       });
 
-      it("should fail with invalid email on update", async () => {
+      it('should fail with invalid email on update', async () => {
         const testUser = await createTestUser(UserModel);
 
         await expect(
@@ -317,16 +317,16 @@ describe("User Resolvers", () => {
             {},
             {
               id: testUser.id.toString(),
-              email: "invalid-email",
+              email: 'invalid-email',
             }
           )
         ).rejects.toThrow();
       });
 
-      it("should handle email case insensitivity when checking duplicates", async () => {
-        await createTestUser(UserModel, { email: "existing@example.com" });
+      it('should handle email case insensitivity when checking duplicates', async () => {
+        await createTestUser(UserModel, { email: 'existing@example.com' });
         const user2 = await createTestUser(UserModel, {
-          email: "user2@example.com",
+          email: 'user2@example.com',
         });
 
         await expect(
@@ -335,18 +335,18 @@ describe("User Resolvers", () => {
             {},
             {
               id: user2.id.toString(),
-              email: "EXISTING@EXAMPLE.COM",
+              email: 'EXISTING@EXAMPLE.COM',
             }
           )
-        ).rejects.toThrow("Email already exists");
+        ).rejects.toThrow('Email already exists');
       });
 
-      it("should throw generic error when update fails with non-Error object", async () => {
+      it('should throw generic error when update fails with non-Error object', async () => {
         const testUser = await createTestUser(UserModel);
 
-        jest.spyOn(UserModel, "findByPk").mockResolvedValueOnce({
+        jest.spyOn(UserModel, 'findByPk').mockResolvedValueOnce({
           ...testUser,
-          update: jest.fn().mockRejectedValueOnce("String error"),
+          update: jest.fn().mockRejectedValueOnce('String error'),
         } as any);
 
         await expect(
@@ -355,20 +355,20 @@ describe("User Resolvers", () => {
             {},
             {
               id: testUser.id.toString(),
-              name: "Updated Name",
+              name: 'Updated Name',
             }
           )
-        ).rejects.toThrow("Failed to update user");
+        ).rejects.toThrow('Failed to update user');
 
         expect(console.error).toHaveBeenCalledWith(
-          "Error updating user:",
-          "String error"
+          'Error updating user:',
+          'String error'
         );
       });
     });
 
-    describe("deleteUser", () => {
-      it("should delete a user", async () => {
+    describe('deleteUser', () => {
+      it('should delete a user', async () => {
         const testUser = await createTestUser(UserModel);
 
         const result = await callResolver(
@@ -385,35 +385,35 @@ describe("User Resolvers", () => {
         expect(found).toBeNull();
       });
 
-      it("should return false for non-existent user", async () => {
+      it('should return false for non-existent user', async () => {
         const result = await callResolver(
           userMutations.deleteUser,
           {},
           {
-            id: "999",
+            id: '999',
           }
         );
 
         expect(result).toBe(false);
       });
 
-      it("should throw error when delete fails", async () => {
+      it('should throw error when delete fails', async () => {
         jest
-          .spyOn(UserModel, "destroy")
-          .mockRejectedValueOnce(new Error("DB error"));
+          .spyOn(UserModel, 'destroy')
+          .mockRejectedValueOnce(new Error('DB error'));
 
         await expect(
           callResolver(
             userMutations.deleteUser,
             {},
             {
-              id: "1",
+              id: '1',
             }
           )
-        ).rejects.toThrow("Failed to delete user");
+        ).rejects.toThrow('Failed to delete user');
 
         expect(console.error).toHaveBeenCalledWith(
-          "Error deleting user:",
+          'Error deleting user:',
           expect.any(Error)
         );
       });

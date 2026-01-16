@@ -17,8 +17,8 @@ const sequelize = new Sequelize(
       max: 10,
       min: 0,
       acquire: 30000,
-      idle: 10000
-    }
+      idle: 10000,
+    },
   }
 );
 
@@ -40,22 +40,26 @@ export async function syncDatabase(): Promise<void> {
   try {
     await sequelize.sync({ alter: true });
     console.log('✅ Database synchronized successfully');
-    
+
     const bookCount = await BookModel.count();
     if (bookCount === 0) {
       await BookModel.bulkCreate([
         { title: '1984', author: 'George Orwell', year: 1949 },
         { title: 'To Kill a Mockingbird', author: 'Harper Lee', year: 1960 },
-        { title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', year: 1925 }
+        {
+          title: 'The Great Gatsby',
+          author: 'F. Scott Fitzgerald',
+          year: 1925,
+        },
       ]);
       console.log('✅ Sample books inserted');
     }
-    
+
     const userCount = await UserModel.count();
     if (userCount === 0) {
       await UserModel.bulkCreate([
         { name: 'Alice Johnson', email: 'alice@example.com' },
-        { name: 'Bob Smith', email: 'bob@example.com' }
+        { name: 'Bob Smith', email: 'bob@example.com' },
       ]);
       console.log('✅ Sample users inserted');
     }

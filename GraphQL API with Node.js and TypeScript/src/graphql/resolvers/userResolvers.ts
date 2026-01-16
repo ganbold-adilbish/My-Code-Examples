@@ -1,20 +1,20 @@
-import { UserModel } from "../../models/index";
+import { UserModel } from '../../models/index';
 import {
   QueryResolvers,
   MutationResolvers,
   UserResolvers,
-} from "../../generated/graphql";
+} from '../../generated/graphql';
 
 export const userQueries: QueryResolvers = {
   users: async () => {
     try {
       const users = await UserModel.findAll({
-        order: [["id", "DESC"]],
+        order: [['id', 'DESC']],
       });
       return users;
     } catch (error) {
-      console.error("Error fetching users:", error);
-      throw new Error("Failed to fetch users");
+      console.error('Error fetching users:', error);
+      throw new Error('Failed to fetch users');
     }
   },
 
@@ -24,8 +24,8 @@ export const userQueries: QueryResolvers = {
       if (!user) return null;
       return user;
     } catch (error) {
-      console.error("Error fetching user:", error);
-      throw new Error("Failed to fetch user");
+      console.error('Error fetching user:', error);
+      throw new Error('Failed to fetch user');
     }
   },
 };
@@ -37,18 +37,18 @@ export const userMutations: MutationResolvers = {
       return user;
     } catch (error) {
       if (error instanceof Error) {
-        if (error.name === "SequelizeUniqueConstraintError") {
-          throw new Error("Email already exists");
+        if (error.name === 'SequelizeUniqueConstraintError') {
+          throw new Error('Email already exists');
         }
-        if (error.name === "SequelizeValidationError") {
+        if (error.name === 'SequelizeValidationError') {
           const validationError = error as any;
           throw new Error(
-            validationError.errors.map((e: any) => e.message).join(", ")
+            validationError.errors.map((e: any) => e.message).join(', ')
           );
         }
       }
-      console.error("Error adding user:", error);
-      throw new Error("Failed to add user");
+      console.error('Error adding user:', error);
+      throw new Error('Failed to add user');
     }
   },
 
@@ -56,7 +56,7 @@ export const userMutations: MutationResolvers = {
     try {
       const user = await UserModel.findByPk(id);
       if (!user) {
-        throw new Error("User not found");
+        throw new Error('User not found');
       }
 
       const updates: Partial<{ name: string; email: string }> = {};
@@ -70,18 +70,18 @@ export const userMutations: MutationResolvers = {
       return user;
     } catch (error) {
       if (error instanceof Error) {
-        if (error.name === "SequelizeUniqueConstraintError") {
-          throw new Error("Email already exists");
+        if (error.name === 'SequelizeUniqueConstraintError') {
+          throw new Error('Email already exists');
         }
-        if (error.name === "SequelizeValidationError") {
+        if (error.name === 'SequelizeValidationError') {
           const validationError = error as any;
           throw new Error(
-            validationError.errors.map((e: any) => e.message).join(", ")
+            validationError.errors.map((e: any) => e.message).join(', ')
           );
         }
       }
-      console.error("Error updating user:", error);
-      throw error instanceof Error ? error : new Error("Failed to update user");
+      console.error('Error updating user:', error);
+      throw error instanceof Error ? error : new Error('Failed to update user');
     }
   },
 
@@ -92,8 +92,8 @@ export const userMutations: MutationResolvers = {
       });
       return result > 0;
     } catch (error) {
-      console.error("Error deleting user:", error);
-      throw new Error("Failed to delete user");
+      console.error('Error deleting user:', error);
+      throw new Error('Failed to delete user');
     }
   },
 };
