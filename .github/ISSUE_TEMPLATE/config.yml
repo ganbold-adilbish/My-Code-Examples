@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 'Support'
+    url: 'https://github.com/ganbold-adilbish/My-Code-Examples/issues'
+    about: 'If you need help with the GraphQL API, contact support here.'

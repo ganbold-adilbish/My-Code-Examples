@@ -1,0 +1,51 @@
+name: GraphQL API with Node.js and TypeScript CI
+
+on:
+  push:
+    branches: ["dev", "main"]
+    paths:
+      - "GraphQL API with Node.js and TypeScript/**"
+  pull_request:
+    branches: ["dev", "main"]
+    paths:
+      - "GraphQL API with Node.js and TypeScript/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x, 24.x]
+
+    defaults:
+      run:
+        working-directory: "GraphQL API with Node.js and TypeScript"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "GraphQL API with Node.js and TypeScript/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate GraphQL types
+        run: npm run generate
+
+      - name: ESLint check
+        run: npm run lint
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Run Jest tests
+        run: npm test
+
+      - name: Prettier check
+        run: npm run format:check
