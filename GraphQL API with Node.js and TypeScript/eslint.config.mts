@@ -1,7 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import { defineConfig } from 'eslint/config';
 
@@ -14,11 +13,8 @@ export default defineConfig([
     languageOptions: {
       globals: globals.node,
     },
-    plugins: {
-      prettier,
-    },
+    plugins: {},
     rules: {
-      'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
