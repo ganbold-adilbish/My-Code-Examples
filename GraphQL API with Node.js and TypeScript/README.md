@@ -1,5 +1,6 @@
 # GraphQL API with Node.js and TypeScript
 
+![CI](https://github.com/ganbold-adilbish/My-Code-Examples/workflows/GraphQL%20API%20with%20Node.js%20and%20TypeScript%20CI/badge.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
 ![GraphQL](https://img.shields.io/badge/GraphQL-E10098?logo=graphql&logoColor=white)
@@ -8,6 +9,57 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 A fully-typed GraphQL API built with Node.js, Apollo Server, MySQL, Sequelize ORM, and TypeScript with auto-generated types.
+
+## Features
+
+- ✅ **Fully Type-Safe** - Auto-generated types from GraphQL schema
+- ✅ **Hot Reload** - Development mode with auto-restart
+- ✅ **Database ORM** - Sequelize with MySQL
+- ✅ **GraphQL Playground** - Built-in Apollo Studio Explorer
+- ✅ **Sample Data** - Pre-populated books and users
+- ✅ **Environment Config** - dotenv for configuration
+- ✅ **Code Quality** - ESLint and Prettier configured
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Available Scripts](#available-scripts)
+- [Usage](#usage)
+- [API Examples](#api-examples)
+- [Models](#models)
+- [GraphQL Code Generator](#graphql-code-generator)
+- [Development](#development)
+- [Adding New Features](#adding-new-features)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/ganbold-adilbish/My-Code-Examples.git
+cd "My-Code-Examples/GraphQL API with Node.js and TypeScript"
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your MySQL credentials
+
+# Create database
+mysql -u root -p -e "CREATE DATABASE graphql_db;"
+
+# Start development server (generates types automatically)
+npm run dev
+```
+
+Visit http://localhost:4000 to explore the API!
 
 ## Tech Stack
 
@@ -18,99 +70,104 @@ A fully-typed GraphQL API built with Node.js, Apollo Server, MySQL, Sequelize OR
 - MySQL
 - GraphQL Code Generator
 - dotenv
+- ESLint & Prettier (Flat Config)
 
 ## Project Structure
 
 ```
 your-project/
 ├── src/
-│   ├── server.ts              # Main entry point
+│   ├── server.ts              # Application entry point
 │   ├── types/
-│   │   └── index.ts          # Custom types (if needed)
+│   │   └── index.ts          # Custom type definitions
 │   ├── models/
-│   │   ├── index.ts          # Sequelize configuration
-│   │   ├── Book.ts           # Book model
-│   │   └── User.ts           # User model
+│   │   ├── index.ts          # Database configuration
+│   │   ├── Book.ts           # Book model definition
+│   │   └── User.ts           # User model definition
 │   ├── graphql/
 │   │   ├── schema.ts         # GraphQL schema definitions
 │   │   └── resolvers/
-│   │       ├── index.ts      # Combines all resolvers
+│   │       ├── index.ts      # Resolver aggregation
 │   │       ├── bookResolvers.ts  # Book queries & mutations
 │   │       └── userResolvers.ts  # User queries & mutations
 │   └── generated/
 │       └── graphql.ts        # Auto-generated types (do not edit)
-├── dist/                     # Compiled JavaScript
-├── .env                      # Environment variables
+├── .vscode/                  # VS Code settings
+├── .env.example              # Environment variables template
 ├── .gitignore
-├── codegen.yml               # GraphQL Code Generator config
-├── package.json
-├── tsconfig.json
-└── README.md
+├── .nvmrc                    # Node version specification
+├── eslint.config.mts         # ESLint configuration (flat config)
+├── .prettierrc               # Prettier configuration
+├── .prettierignore           # Prettier ignore patterns
+├── codegen.yml               # GraphQL Code Generator configuration
+├── jest.config.ts            # Jest testing configuration
+├── package.json              # Project dependencies and scripts
+├── tsconfig.json             # TypeScript compiler configuration
+└── README.md                 # Project documentation
 ```
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- MySQL (v5.7 or higher)
-- npm
+- Node.js (v20 or higher) - [Download](https://nodejs.org/)
+- MySQL (v8.0 or higher) - [Download](https://dev.mysql.com/downloads/mysql/)
+- npm (comes with Node.js)
 
 ## Installation
 
-### 1. Install dependencies
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/ganbold-adilbish/My-Code-Examples.git
+cd "My-Code-Examples/GraphQL API with Node.js and TypeScript"
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Create MySQL database
+### 3. Set up environment variables
 
-```sql
-CREATE DATABASE graphql_db;
-```
-
-### 3. Configure .env file
-
-Copy the `.env.example` file and update with your credentials:
+Create a `.env` file in the root directory:
 
 ```bash
 cp .env.example .env
 ```
 
-Then edit `.env` with your MySQL credentials:
+Edit `.env` with your MySQL credentials:
 
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_actual_password
+DB_PASSWORD=your_password_here
 DB_NAME=graphql_db
 PORT=4000
 ```
 
-### 4. Generate TypeScript types
+**⚠️ Important:** Never commit your `.env` file to Git. It's already in `.gitignore`.
+
+### 4. Create MySQL database
 
 ```bash
-npm run generate
+mysql -u root -p -e "CREATE DATABASE graphql_db;"
 ```
 
-This generates TypeScript types from your GraphQL schema into `src/generated/graphql.ts`.
+Or using MySQL Workbench or any MySQL client.
 
-### 5. Build the project
-
-```bash
-npm run build
-```
-
-### 6. Start the server
-
-```bash
-npm start
-```
-
-For development with auto-restart:
+### 5. Start development server
 
 ```bash
 npm run dev
 ```
+
+The server will:
+
+- Generate TypeScript types from GraphQL schema
+- Connect to MySQL database
+- Sync database tables automatically
+- Insert sample data
+- Start the development server with hot reload
 
 You should see:
 
@@ -122,15 +179,25 @@ You should see:
 🚀 GraphQL Server ready at: http://localhost:4000/
 ```
 
+Visit `http://localhost:4000` to explore the API with Apollo Studio Explorer!
+
 ## Available Scripts
 
-```bash
-npm run generate    # Generate TypeScript types from GraphQL schema
-npm run build       # Generate types + compile TypeScript
-npm start           # Run production server
-npm run dev         # Run development server with auto-restart
-npm run watch       # Watch TypeScript compilation
-```
+| Command                 | Description                                       |
+| ----------------------- | ------------------------------------------------- |
+| `npm run generate`      | Generate TypeScript types from GraphQL schema     |
+| `npm run build`         | Generate types + compile TypeScript to JavaScript |
+| `npm start`             | Run production server from compiled code          |
+| `npm run dev`           | Run development server with hot reload            |
+| `npm run watch`         | Watch TypeScript compilation in real-time         |
+| `npm test`              | Run Jest tests                                    |
+| `npm run test:watch`    | Run Jest tests in watch mode                      |
+| `npm run test:coverage` | Run tests with coverage report                    |
+| `npm run format`        | Format code with Prettier                         |
+| `npm run format:check`  | Check if code is formatted correctly              |
+| `npm run lint`          | Run ESLint to check code quality                  |
+| `npm run lint:fix`      | Run ESLint and auto-fix issues                    |
+| `npm run check`         | Run both lint and format checks                   |
 
 ## Usage
 
@@ -305,28 +372,31 @@ This project uses GraphQL Code Generator to automatically generate TypeScript ty
 
 ## Development
 
-**Generate types:**
+### Working with GraphQL Schema
+
+When you modify the GraphQL schema in `src/graphql/schema.ts`:
+
+1. Restart the dev server: `Ctrl+C` then `npm run dev`
+2. Or manually regenerate types: `npm run generate`
+
+The dev server will automatically pick up the new types and restart.
+
+### Before Committing
+
+Run the check script to ensure code quality:
 
 ```bash
-npm run generate
+npm run check
 ```
 
-**Run in development mode:**
+This runs both ESLint and Prettier checks.
+
+### Running Tests
 
 ```bash
-npm run dev
-```
-
-**Build for production:**
-
-```bash
-npm run build
-```
-
-**Watch TypeScript compilation:**
-
-```bash
-npm run watch
+npm test              # Run once
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
 ```
 
 ## Type Safety
@@ -355,6 +425,77 @@ export const bookQueries: QueryResolvers = {
 5. **Combine resolvers**: Update `src/graphql/resolvers/index.ts`
 
 TypeScript will guide you with full type checking!
+
+## Troubleshooting
+
+### Database Connection Issues
+
+If you see "Access denied for user":
+
+- Check your MySQL credentials in `.env`
+- Ensure MySQL is running: `mysql.server status` (macOS) or `sudo service mysql status` (Linux)
+- Verify the database exists: `mysql -u root -p -e "SHOW DATABASES;"`
+
+### Port Already in Use
+
+If port 4000 is taken:
+
+- Change `PORT` in your `.env` file
+- Or kill the process using port 4000: `lsof -ti:4000 | xargs kill`
+
+### Type Generation Errors
+
+If `npm run generate` fails:
+
+```bash
+# Clear generated files and try again
+rm -rf src/generated
+npm run generate
+```
+
+### Module Not Found
+
+If you get module import errors:
+
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### ESLint/Prettier Issues
+
+If linting or formatting fails:
+
+```bash
+# Auto-fix ESLint issues
+npm run lint -- --fix
+
+# Format all files
+npm run format
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Editor Setup
+
+This project includes VS Code settings for:
+
+- Format on save
+- ESLint auto-fix on save
+
+**Recommended VS Code extensions:**
+
+- ESLint (`dbaeumer.vscode-eslint`)
+- Prettier (`esbenp.prettier-vscode`)
 
 ## License
 
