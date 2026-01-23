@@ -8,7 +8,7 @@ import {
 import {
   userQueries,
   userMutations,
-} from '../../graphql/resolvers/userResolvers';
+} from '../../graphql/resolvers/user.resolvers';
 
 describe('User Resolvers', () => {
   const { sequelize, UserModel } = createTestDatabase();

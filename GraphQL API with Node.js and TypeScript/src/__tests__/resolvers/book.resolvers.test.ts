@@ -8,7 +8,7 @@ import {
 import {
   bookQueries,
   bookMutations,
-} from '../../graphql/resolvers/bookResolvers';
+} from '../../graphql/resolvers/book.resolvers';
 
 describe('Book Resolvers', () => {
   const { sequelize, BookModel } = createTestDatabase();
