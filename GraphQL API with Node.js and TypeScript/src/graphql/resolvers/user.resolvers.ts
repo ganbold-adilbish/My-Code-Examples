@@ -1,10 +1,10 @@
-import { UserModel } from '../../models/index';
+import { ValidationError, ValidationErrorItem } from 'sequelize';
+import { UserModel } from '../../models';
 import {
   QueryResolvers,
   MutationResolvers,
   UserResolvers,
 } from '../../generated/graphql';
-import { ValidationError, ValidationErrorItem } from 'sequelize';
 
 export const userQueries: QueryResolvers = {
   users: async () => {

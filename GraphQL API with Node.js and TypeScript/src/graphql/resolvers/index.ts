@@ -1,5 +1,5 @@
-import { bookQueries, bookMutations, Book } from './bookResolvers';
-import { userQueries, userMutations, User } from './userResolvers';
+import { bookQueries, bookMutations, Book } from './book.resolvers';
+import { userQueries, userMutations, User } from './user.resolvers';
 
 export const resolvers = {
   Query: {
@@ -10,6 +10,6 @@ export const resolvers = {
     ...bookMutations,
     ...userMutations,
   },
-  User,
   Book,
+  User,
 };
