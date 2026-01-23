@@ -2,8 +2,7 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import dotenv from 'dotenv';
 import { testConnection, syncDatabase, closeDatabase } from './models';
-import { typeDefs } from './graphql/schema';
-import { resolvers } from './graphql/resolvers';
+import { typeDefs, resolvers } from './graphql';
 
 dotenv.config();
 
