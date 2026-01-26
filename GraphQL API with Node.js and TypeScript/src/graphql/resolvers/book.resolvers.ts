@@ -1,5 +1,5 @@
 import { Op, ValidationError, ValidationErrorItem } from 'sequelize';
-import { BookModel } from '../../models';
+import { BookModel, AuthorModel } from '../../models';
 import {
   QueryResolvers,
   MutationResolvers,
@@ -10,6 +10,7 @@ export const bookQueries: QueryResolvers = {
   books: async () => {
     try {
       const books = await BookModel.findAll({
+        include: [{ model: AuthorModel, as: 'author' }],
         order: [['id', 'DESC']],
       });
       return books;
@@ -21,7 +22,9 @@ export const bookQueries: QueryResolvers = {
 
   book: async (_parent, { id }) => {
     try {
-      const book = await BookModel.findByPk(id);
+      const book = await BookModel.findByPk(id, {
+        include: [{ model: AuthorModel, as: 'author' }],
+      });
       if (!book) return null;
       return book;
     } catch (error) {
@@ -38,6 +41,7 @@ export const bookQueries: QueryResolvers = {
             [Op.like]: `%${title}%`,
           },
         },
+        include: [{ model: AuthorModel, as: 'author' }],
       });
       return books;
     } catch (error) {
@@ -48,9 +52,23 @@ export const bookQueries: QueryResolvers = {
 };
 
 export const bookMutations: MutationResolvers = {
-  addBook: async (_parent, { title, author, year }) => {
+  addBook: async (_parent, { title, authorId, year }) => {
     try {
-      const book = await BookModel.create({ title, author, year });
+      const author = await AuthorModel.findByPk(authorId);
+      if (!author) {
+        throw new Error('Author not found');
+      }
+
+      const book = await BookModel.create({
+        title,
+        author_id: Number(authorId),
+        year,
+      });
+
+      await book.reload({
+        include: [{ model: AuthorModel, as: 'author' }],
+      });
+
       return book;
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -59,26 +77,41 @@ export const bookMutations: MutationResolvers = {
         );
       }
       console.error('Error adding book:', error);
-      throw new Error('Failed to add book');
+      throw error instanceof Error ? error : new Error('Failed to add book');
     }
   },
 
-  updateBook: async (_parent, { id, title, author, year }) => {
+  updateBook: async (_parent, { id, title, authorId, year }) => {
     try {
       const book = await BookModel.findByPk(id);
       if (!book) {
         throw new Error('Book not found');
       }
 
-      const updates: Partial<{ title: string; author: string; year: number }> =
-        {};
+      if (authorId) {
+        const author = await AuthorModel.findByPk(authorId);
+        if (!author) {
+          throw new Error('Author not found');
+        }
+      }
+
+      const updates: Partial<{
+        title: string;
+        author_id: number;
+        year: number;
+      }> = {};
       if (title !== undefined && title !== null) updates.title = title;
-      if (author !== undefined && author !== null) updates.author = author;
+      if (authorId !== undefined && authorId !== null)
+        updates.author_id = Number(authorId);
       if (year !== undefined && year !== null) updates.year = year;
 
       if (Object.keys(updates).length > 0) {
         await book.update(updates);
       }
+
+      await book.reload({
+        include: [{ model: AuthorModel, as: 'author' }],
+      });
 
       return book;
     } catch (error) {
