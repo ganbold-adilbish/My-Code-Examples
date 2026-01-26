@@ -3,7 +3,8 @@ import { DataTypes, Model, Sequelize, Optional } from 'sequelize';
 interface BookAttributes {
   id: number;
   title: string;
-  author: string;
+  // Foreign key to Author
+  author_id: number;
   year: number;
   created_at?: Date;
   updated_at?: Date;
@@ -21,7 +22,7 @@ export class BookModel
 {
   public id!: number;
   public title!: string;
-  public author!: string;
+  public author_id!: number;
   public year!: number;
   public created_at?: Date;
   public updated_at?: Date;
@@ -51,13 +52,12 @@ export function initBookModel(sequelize: Sequelize): typeof BookModel {
           },
         },
       },
-      author: {
-        type: DataTypes.STRING(255),
+      author_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-          notEmpty: {
-            msg: 'Author cannot be empty',
-          },
+        references: {
+          model: 'authors',
+          key: 'id',
         },
       },
       year: {
