@@ -1,0 +1,21 @@
+type Author {
+  id: ID!
+  user: User!
+  bio: String!
+  website: String
+  books: [Book!]!
+  created_at: String
+  updated_at: String
+}
+
+extend type Query {
+  authors: [Author!]!
+  author(id: ID!): Author
+}
+
+extend type Mutation {
+  # We might not need addAuthor if it's created via User profile,
+  # but let's keep it simple for now (promote User to Author)
+  createAuthorProfile(userId: ID!, bio: String!, website: String): Author!
+  updateAuthorProfile(id: ID!, bio: String, website: String): Author
+}
