@@ -72,10 +72,15 @@ export const authorMutations: MutationResolvers = {
           error.errors.map((e: ValidationErrorItem) => e.message).join(', ')
         );
       }
+      if (
+        error instanceof Error &&
+        (error.message === 'User not found' ||
+          error.message === 'Author profile already exists for this user')
+      ) {
+        throw error;
+      }
       console.error('Error creating author profile:', error);
-      throw error instanceof Error
-        ? error
-        : new Error('Failed to create author profile');
+      throw new Error('Failed to create author profile');
     }
   },
 

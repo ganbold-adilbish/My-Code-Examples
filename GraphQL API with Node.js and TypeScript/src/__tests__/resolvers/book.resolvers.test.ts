@@ -3,6 +3,7 @@ import {
   syncTestDatabase,
   closeTestDatabase,
   createTestBook,
+  createTestAuthor,
   callResolver,
 } from '../helpers/testHelper';
 import {
@@ -11,7 +12,7 @@ import {
 } from '../../graphql/resolvers/book.resolvers';
 
 describe('Book Resolvers', () => {
-  const { sequelize, BookModel } = createTestDatabase();
+  const { sequelize, BookModel, AuthorModel, UserModel } = createTestDatabase();
 
   beforeAll(async () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -25,14 +26,17 @@ describe('Book Resolvers', () => {
 
   afterEach(async () => {
     await BookModel.destroy({ where: {}, truncate: true });
+    await AuthorModel.destroy({ where: {}, truncate: true });
+    await UserModel.destroy({ where: {}, truncate: true });
   });
 
   describe('Queries', () => {
     describe('books', () => {
       it('should return all books', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
         await BookModel.bulkCreate([
-          { title: 'Book 1', author: 'Author 1', year: 2021 },
-          { title: 'Book 2', author: 'Author 2', year: 2022 },
+          { title: 'Book 1', author_id: author.id, year: 2021 },
+          { title: 'Book 2', author_id: author.id, year: 2022 },
         ]);
 
         const books = await callResolver(bookQueries.books);
@@ -47,9 +51,19 @@ describe('Book Resolvers', () => {
       });
 
       it('should return books in descending order by id', async () => {
-        const book1 = await createTestBook(BookModel, { title: 'First' });
-        const book2 = await createTestBook(BookModel, { title: 'Second' });
-        const book3 = await createTestBook(BookModel, { title: 'Third' });
+        const author = await createTestAuthor(AuthorModel, UserModel);
+        const book1 = await createTestBook(BookModel, AuthorModel, UserModel, {
+          title: 'First',
+          author_id: author.id,
+        });
+        const book2 = await createTestBook(BookModel, AuthorModel, UserModel, {
+          title: 'Second',
+          author_id: author.id,
+        });
+        const book3 = await createTestBook(BookModel, AuthorModel, UserModel, {
+          title: 'Third',
+          author_id: author.id,
+        });
 
         const books = await callResolver(bookQueries.books);
 
@@ -76,9 +90,14 @@ describe('Book Resolvers', () => {
 
     describe('book', () => {
       it('should return a book by id', async () => {
-        const testBook = await createTestBook(BookModel, {
-          title: 'Test Book',
-        });
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel,
+          {
+            title: 'Test Book',
+          }
+        );
 
         const book = await callResolver(
           bookQueries.book,
@@ -113,18 +132,38 @@ describe('Book Resolvers', () => {
 
     describe('searchBooks', () => {
       it('should find books by title', async () => {
+        const author1 = await createTestAuthor(AuthorModel, UserModel, {
+          user_name: 'F. Scott Fitzgerald',
+          user_email: 'fitzgerald@example.com',
+          bio: 'Author of The Great Gatsby',
+        });
+        const author2 = await createTestAuthor(AuthorModel, UserModel, {
+          user_name: 'Charles Dickens',
+          user_email: 'dickens@example.com',
+          bio: 'Author of Great Expectations',
+        });
+        const author3 = await createTestAuthor(AuthorModel, UserModel, {
+          user_name: 'George Orwell',
+          user_email: 'orwell@example.com',
+          bio: 'Author of 1984',
+        });
+
         await BookModel.bulkCreate([
           {
             title: 'The Great Gatsby',
-            author: 'F. Scott Fitzgerald',
+            author_id: author1.id,
             year: 1925,
           },
           {
             title: 'Great Expectations',
-            author: 'Charles Dickens',
+            author_id: author2.id,
             year: 1861,
           },
-          { title: '1984', author: 'George Orwell', year: 1949 },
+          {
+            title: '1984',
+            author_id: author3.id,
+            year: 1949,
+          },
         ]);
 
         const books = (await callResolver(
@@ -138,7 +177,7 @@ describe('Book Resolvers', () => {
       });
 
       it('should return empty array when no matches', async () => {
-        await createTestBook(BookModel);
+        await createTestBook(BookModel, AuthorModel, UserModel);
 
         const books = await callResolver(
           bookQueries.searchBooks,
@@ -150,7 +189,9 @@ describe('Book Resolvers', () => {
       });
 
       it('should be case insensitive', async () => {
-        await createTestBook(BookModel, { title: 'Test Book' });
+        await createTestBook(BookModel, AuthorModel, UserModel, {
+          title: 'Test Book',
+        });
 
         const books = await callResolver(
           bookQueries.searchBooks,
@@ -162,9 +203,11 @@ describe('Book Resolvers', () => {
       });
 
       it('should handle empty string search', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
+
         await BookModel.bulkCreate([
-          { title: 'Book 1', author: 'Author 1', year: 2021 },
-          { title: 'Book 2', author: 'Author 2', year: 2022 },
+          { title: 'Book 1', author_id: author.id, year: 2021 },
+          { title: 'Book 2', author_id: author.id, year: 2022 },
         ]);
 
         const books = await callResolver(
@@ -177,7 +220,9 @@ describe('Book Resolvers', () => {
       });
 
       it('should handle special characters in search', async () => {
-        await createTestBook(BookModel, { title: 'Test & Book: Special' });
+        await createTestBook(BookModel, AuthorModel, UserModel, {
+          title: 'Test & Book: Special',
+        });
 
         const books = await callResolver(
           bookQueries.searchBooks,
@@ -208,30 +253,46 @@ describe('Book Resolvers', () => {
   describe('Mutations', () => {
     describe('addBook', () => {
       it('should create a new book', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
         const book = await callResolver(
           bookMutations.addBook,
           {},
           {
             title: 'New Book',
-            author: 'New Author',
+            authorId: author.id,
             year: 2024,
           }
         );
 
         expect(book.id).toBeDefined();
         expect(book.title).toBe('New Book');
-        expect(book.author).toBe('New Author');
+        expect(book.author_id).toBe(author.id);
         expect(book.year).toBe(2024);
       });
 
+      it('should throw error for non-existent author', async () => {
+        await expect(
+          callResolver(
+            bookMutations.addBook,
+            {},
+            {
+              title: 'New Book',
+              authorId: '999',
+              year: 2024,
+            }
+          )
+        ).rejects.toThrow('Author not found');
+      });
+
       it('should fail with invalid year', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
         await expect(
           callResolver(
             bookMutations.addBook,
             {},
             {
               title: 'Test',
-              author: 'Test',
+              authorId: author.id,
               year: 500,
             }
           )
@@ -239,12 +300,13 @@ describe('Book Resolvers', () => {
       });
 
       it('should accept year 1000 (minimum valid year)', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
         const book = await callResolver(
           bookMutations.addBook,
           {},
           {
             title: 'Ancient Book',
-            author: 'Ancient Author',
+            authorId: author.id,
             year: 1000,
           }
         );
@@ -253,13 +315,14 @@ describe('Book Resolvers', () => {
       });
 
       it('should accept current year', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
         const currentYear = new Date().getFullYear();
         const book = await callResolver(
           bookMutations.addBook,
           {},
           {
             title: 'Current Book',
-            author: 'Modern Author',
+            authorId: author.id,
             year: currentYear,
           }
         );
@@ -268,13 +331,14 @@ describe('Book Resolvers', () => {
       });
 
       it('should handle special characters in title', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
         const specialTitle = "Test & Book: A 'Special' Edition (2024)";
         const book = await callResolver(
           bookMutations.addBook,
           {},
           {
             title: specialTitle,
-            author: 'Test Author',
+            authorId: author.id,
             year: 2024,
           }
         );
@@ -283,6 +347,8 @@ describe('Book Resolvers', () => {
       });
 
       it('should throw generic error when create fails', async () => {
+        const author = await createTestAuthor(AuthorModel, UserModel);
+
         jest
           .spyOn(BookModel, 'create')
           .mockRejectedValueOnce(new Error('DB error'));
@@ -293,7 +359,7 @@ describe('Book Resolvers', () => {
             {},
             {
               title: 'Test',
-              author: 'Test',
+              authorId: author.id,
               year: 2024,
             }
           )
@@ -308,7 +374,16 @@ describe('Book Resolvers', () => {
 
     describe('updateBook', () => {
       it('should update book fields', async () => {
-        const testBook = await createTestBook(BookModel);
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
+        const newAuthor = await createTestAuthor(AuthorModel, UserModel, {
+          user_name: 'New Author',
+          user_email: 'newauthor@example.com',
+          bio: 'New Author Bio',
+        });
 
         const updated = await callResolver(
           bookMutations.updateBook,
@@ -316,11 +391,32 @@ describe('Book Resolvers', () => {
           {
             id: testBook.id.toString(),
             title: 'Updated Title',
+            authorId: newAuthor.id,
           }
         );
 
         expect(updated?.title).toBe('Updated Title');
-        expect(updated?.author).toBe(testBook.author);
+        expect(updated?.author_id).toBe(newAuthor.id);
+      });
+
+      it('should throw error for non-existent author', async () => {
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
+
+        await expect(
+          callResolver(
+            bookMutations.updateBook,
+            {},
+            {
+              id: testBook.id.toString(),
+              title: 'Updated',
+              authorId: '999',
+            }
+          )
+        ).rejects.toThrow('Author not found');
       });
 
       it('should throw error for non-existent book', async () => {
@@ -337,7 +433,11 @@ describe('Book Resolvers', () => {
       });
 
       it('should not update if no fields provided', async () => {
-        const testBook = await createTestBook(BookModel);
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
 
         const updated = await callResolver(
           bookMutations.updateBook,
@@ -351,7 +451,16 @@ describe('Book Resolvers', () => {
       });
 
       it('should update multiple fields at once', async () => {
-        const testBook = await createTestBook(BookModel);
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
+        const newAuthor = await createTestAuthor(AuthorModel, UserModel, {
+          user_name: 'New Author',
+          user_email: 'newauthor@example.com',
+          bio: 'New Author Bio',
+        });
 
         const updated = await callResolver(
           bookMutations.updateBook,
@@ -359,18 +468,22 @@ describe('Book Resolvers', () => {
           {
             id: testBook.id.toString(),
             title: 'New Title',
-            author: 'New Author',
+            authorId: newAuthor.id,
             year: 2025,
           }
         );
 
         expect(updated?.title).toBe('New Title');
-        expect(updated?.author).toBe('New Author');
+        expect(updated?.author_id).toBe(newAuthor.id);
         expect(updated?.year).toBe(2025);
       });
 
       it('should handle validation error on update', async () => {
-        const testBook = await createTestBook(BookModel);
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
 
         await expect(
           callResolver(
@@ -385,7 +498,11 @@ describe('Book Resolvers', () => {
       });
 
       it('should throw generic error when update fails with non-Error object', async () => {
-        const testBook = await createTestBook(BookModel);
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
 
         jest.spyOn(BookModel, 'findByPk').mockResolvedValueOnce({
           ...testBook,
@@ -414,7 +531,11 @@ describe('Book Resolvers', () => {
 
     describe('deleteBook', () => {
       it('should delete a book', async () => {
-        const testBook = await createTestBook(BookModel);
+        const testBook = await createTestBook(
+          BookModel,
+          AuthorModel,
+          UserModel
+        );
 
         const result = await callResolver(
           bookMutations.deleteBook,

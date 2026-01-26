@@ -76,8 +76,11 @@ export const bookMutations: MutationResolvers = {
           error.errors.map((e: ValidationErrorItem) => e.message).join(', ')
         );
       }
+      if (error instanceof Error && error.message === 'Author not found') {
+        throw error;
+      }
       console.error('Error adding book:', error);
-      throw error instanceof Error ? error : new Error('Failed to add book');
+      throw new Error('Failed to add book');
     }
   },
 
