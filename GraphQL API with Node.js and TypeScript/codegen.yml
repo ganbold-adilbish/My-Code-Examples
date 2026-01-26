@@ -10,3 +10,4 @@ generates:
       mappers:
         Book: '../models/Book#BookModel'
         User: '../models/User#UserModel'
+        Author: '../models/Author#AuthorModel'
