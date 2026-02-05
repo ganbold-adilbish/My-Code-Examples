@@ -16,7 +16,7 @@ A fully-typed GraphQL API built with Node.js, Apollo Server, MySQL, Sequelize OR
 - ✅ **Hot Reload** - Development mode with auto-restart
 - ✅ **Database ORM** - Sequelize with MySQL
 - ✅ **GraphQL Playground** - Built-in Apollo Studio Explorer
-- ✅ **Sample Data** - Pre-populated books and users
+- ✅ **Sample Data** - Pre-populated books, users, and authors
 - ✅ **Environment Config** - dotenv for configuration
 - ✅ **Code Quality** - ESLint and Prettier configured
 
@@ -78,20 +78,30 @@ Visit http://localhost:4000 to explore the API!
 your-project/
 ├── src/
 │   ├── server.ts              # Application entry point
-│   ├── types/
-│   │   └── index.ts          # Custom type definitions
 │   ├── models/
-│   │   ├── index.ts          # Database configuration
+│   │   ├── index.ts          # Database configuration & initialization
 │   │   ├── Book.ts           # Book model definition
-│   │   └── User.ts           # User model definition
+│   │   ├── User.ts           # User model definition
+│   │   └── Author.ts         # Author model definition
 │   ├── graphql/
-│   │   ├── schema.ts         # GraphQL schema definitions
+│   │   ├── index.ts          # GraphQL exports aggregation
+│   │   ├── schema/
+│   │   │   ├── index.ts      # Schema aggregation
+│   │   │   ├── common.graphql    # Common type definitions
+│   │   │   ├── book.graphql      # Book schema
+│   │   │   ├── user.graphql      # User schema
+│   │   │   └── author.graphql    # Author schema
 │   │   └── resolvers/
-│   │       ├── index.ts      # Resolver aggregation
-│   │       ├── bookResolvers.ts  # Book queries & mutations
-│   │       └── userResolvers.ts  # User queries & mutations
-│   └── generated/
-│       └── graphql.ts        # Auto-generated types (do not edit)
+│   │       ├── index.ts          # Resolver aggregation
+│   │       ├── book.resolvers.ts # Book queries & mutations
+│   │       ├── user.resolvers.ts # User queries & mutations
+│   │       └── author.resolvers.ts # Author queries & mutations
+│   ├── generated/
+│   │   └── graphql.ts        # Auto-generated types (do not edit)
+│   └── __tests__/            # Test files
+│       ├── models/           # Model tests
+│       ├── resolvers/        # Resolver tests
+│       └── helpers/          # Test helper utilities
 ├── .vscode/                  # VS Code settings
 ├── .env.example              # Environment variables template
 ├── .gitignore
@@ -214,10 +224,14 @@ query {
   books {
     id
     title
-    author
     year
     created_at
     updated_at
+    author {
+      id
+      bio
+      website
+    }
   }
 }
 ```
@@ -229,8 +243,12 @@ query {
   book(id: "1") {
     id
     title
-    author
     year
+    author {
+      id
+      bio
+      website
+    }
   }
 }
 ```
@@ -242,7 +260,11 @@ query {
   searchBooks(title: "gatsby") {
     id
     title
-    author
+    author {
+      id
+      bio
+      website
+    }
   }
 }
 ```
@@ -259,13 +281,29 @@ query {
 }
 ```
 
+**Get all authors:**
+
+```graphql
+query {
+  authors {
+    id
+    bio
+    website
+    user {
+      name
+      email
+    }
+  }
+}
+```
+
 ### Mutations
 
 **Add a book:**
 
 ```graphql
 mutation {
-  addBook(title: "The Hobbit", author: "J.R.R. Tolkien", year: 1937) {
+  addBook(title: "The Hobbit", author_id: 1, year: 1937) {
     id
     title
     author
@@ -331,7 +369,7 @@ mutation {
 
 - `id` - Integer, Primary Key
 - `title` - String (required)
-- `author` - String (required)
+- `author_id` - Integer (required, Foreign Key to Author)
 - `year` - Integer (required)
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
@@ -344,13 +382,22 @@ mutation {
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
 
+### Author
+
+- `id` - Integer, Primary Key
+- `user_id` - Integer (required, unique, Foreign Key to User)
+- `bio` - Text (required)
+- `website` - String (optional, must be valid URL)
+- `created_at` - Timestamp
+- `updated_at` - Timestamp
+
 ## GraphQL Code Generator
 
 This project uses GraphQL Code Generator to automatically generate TypeScript types from your GraphQL schema.
 
 ### How it works:
 
-1. **Edit schema** in `src/graphql/schema.ts`
+1. **Edit schema** in `src/graphql/schema/*.graphql` files
 2. **Run generator**: `npm run generate`
 3. **Types are created** in `src/generated/graphql.ts`
 4. **Use typed resolvers** with full IntelliSense
@@ -365,7 +412,7 @@ This project uses GraphQL Code Generator to automatically generate TypeScript ty
 
 ### Adding New Types:
 
-1. Update `src/graphql/schema.ts`
+1. Update or create `src/graphql/schema/*.graphql` files
 2. Run `npm run generate`
 3. Create resolver functions with auto-generated types
 4. Types automatically match your schema!
@@ -374,7 +421,14 @@ This project uses GraphQL Code Generator to automatically generate TypeScript ty
 
 ### Working with GraphQL Schema
 
-When you modify the GraphQL schema in `src/graphql/schema.ts`:
+The GraphQL schema is modularized into separate `.graphql` files in `src/graphql/schema/`:
+
+- `common.graphql` - Common type definitions
+- `book.graphql` - Book type, queries, and mutations
+- `user.graphql` - User type, queries, and mutations
+- `author.graphql` - Author type, queries, and mutations
+
+When you modify any `.graphql` schema file:
 
 1. Restart the dev server: `Ctrl+C` then `npm run dev`
 2. Or manually regenerate types: `npm run generate`
@@ -418,11 +472,12 @@ export const bookQueries: QueryResolvers = {
 
 ### Adding a New Model:
 
-1. **Create model**: `src/models/Author.ts`
-2. **Update schema**: Add to `src/graphql/schema.ts`
-3. **Generate types**: `npm run generate`
-4. **Create resolvers**: `src/graphql/resolvers/authorResolvers.ts`
-5. **Combine resolvers**: Update `src/graphql/resolvers/index.ts`
+1. **Create model**: `src/models/YourModel.ts`
+2. **Initialize model**: Update `src/models/index.ts` to import and initialize your model
+3. **Create schema**: Add `src/graphql/schema/yourmodel.graphql` with types, queries, and mutations
+4. **Generate types**: `npm run generate`
+5. **Create resolvers**: `src/graphql/resolvers/yourmodel.resolvers.ts`
+6. **Combine resolvers**: Update `src/graphql/resolvers/index.ts`
 
 TypeScript will guide you with full type checking!
 
